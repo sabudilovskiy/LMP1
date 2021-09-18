@@ -1,9 +1,17 @@
 #include "Node.h"
 #include <string>
+template<class T>
+Node<T>::Node(T value) {this->value = value;}
 
-Node::Node(int value) {this->value = value;}
-Node *Node::getNext() {return next;}
-int Node::getValue() {return value;}
-void Node::setNext(Node* node) {next = node;}
-void Node::setValue(int value) {this->value = value;}
-std::string Node::to_string() {return std::to_string(value);}
+template<class T>
+Node<T>* Node<T>::getNext() {return next;}
+
+template<class T>
+T Node<T>::getValue() {return value;}
+
+template<class T>
+void Node<T>::setNext(Node<T>* node) {next = node;}
+
+template<class T>
+void Node<T>::setValue(T value) {this->value = value;}
+

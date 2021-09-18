@@ -1,27 +1,29 @@
 #include "List.h"
 #include <stdexcept>
 
-List::~List() {
+template<class T>
+List<T>::~List() {
     clear();
 }
-
-void List::push_back(int value) {
+template<class T>
+void List<T>::push_back(T value) {
     if (n == 0){
-        first_node = new Node(value);
+        first_node = new Node<T>(value);
         last_node = first_node;
     }
     else{
-        last_node->setNext(new Node(value));
+        last_node->setNext(new Node<T>(value));
         last_node = last_node->getNext();
     }
     n++;
 }
 
-void List::add(int index, int value) {
+template<class T>
+void List<T>::add(int index, T value) {
     if (index < 0)throw std::out_of_range("");
     if (index < n){
         int i = 0;
-        Node* previous, *cur_node = first_node, *next;
+        Node<T>* previous, *cur_node = first_node, *next;
         while (i != index && cur_node->getNext()!= nullptr){
             cur_node = cur_node->getNext();
             i++;
@@ -29,7 +31,7 @@ void List::add(int index, int value) {
         if (i != index) throw std::invalid_argument("");
         previous = cur_node;
         next = previous->getNext();
-        Node*new_node = new Node(value);
+        Node<T>*new_node = new Node<T>(value);
         previous->setNext(new_node);
         new_node->setNext(next);
     }
@@ -37,20 +39,22 @@ void List::add(int index, int value) {
         push_back(value);
     }
     else if (index == n && index == 0){
-        first_node = new Node(value);
+        first_node = new Node<T>(value);
         last_node = first_node;
     }
     else throw std::out_of_range("");
     n++;
 }
 
-bool List::empty() const {return n == 0;}
+template<class T>
+bool List<T>::empty() const {return n == 0;}
 
-std::string List::to_string() {
+template<class T>
+std::string List<T>::to_string(std::string (*to_string)(T t)) {
     std::string answer;
     if (first_node != nullptr) {
         answer += std::to_string(first_node->getValue());
-        Node* cur_node = first_node->getNext();
+        Node<T>* cur_node = first_node->getNext();
         while (cur_node != nullptr){
             answer += " " + std::to_string(cur_node->getValue());
             cur_node = cur_node->getNext();
@@ -60,9 +64,10 @@ std::string List::to_string() {
     else return "";
 }
 
-void List::remove_last() {
+template<class T>
+void List<T>::remove_last() {
     if (last_node != nullptr){
-        Node* cur_node = find_node(n - 2);
+        Node<T>* cur_node = find_node(n - 2);
         delete last_node;
         last_node = cur_node;
         last_node->setNext(nullptr);
@@ -70,15 +75,16 @@ void List::remove_last() {
     else throw std::out_of_range("");
 }
 
-void List::remove(int index){
+template<class T>
+void List<T>::remove(int index){
     if (index == 0 && n == 1){
         delete first_node;
         first_node = nullptr;
         last_node = nullptr;
     }
     else if (index < n){
-        Node* previous_node = find_node(index - 1);
-        Node* next_node = previous_node->getNext()->getNext();
+        Node<T>* previous_node = find_node(index - 1);
+        Node<T>* next_node = previous_node->getNext()->getNext();
         delete previous_node->getNext();
         previous_node->setNext(next_node);
         if (next_node == nullptr) last_node = previous_node;
@@ -86,7 +92,9 @@ void List::remove(int index){
     else throw std::out_of_range("");
     n--;
 }
-void List::remove(int start, int end) {
+
+template<class T>
+void List<T>::remove(int start, int end) {
     int i = end - start + 1;
     int j = 0;
     //слишком гениальный код
@@ -95,21 +103,24 @@ void List::remove(int start, int end) {
     subList.List::~List();
 }
 
-int List::size() const {
+template<class T>
+int List<T>::size() const {
     return n;
 }
 
-int List::operator[](int index) {
+template<class T>
+T List<T>::operator[](int index) {
    return find_node(index)->getValue();
 }
 
-void List::sublist(int start, int end, List& subList) {
+template<class T>
+void List<T>::sublist(int start, int end, List<T>& subList) {
     {
         if (start < 0 || start > end || end >= n) throw std::invalid_argument("");
         else if (start > 0 && end < n - 1){
             subList.clear();
-            Node* last_prev_sublist = find_node(start - 1);
-            Node* last_sublist_node = find_node(end);
+            Node<T>* last_prev_sublist = find_node(start - 1);
+            Node<T>* last_sublist_node = find_node(end);
             subList.n = end - start + 1;
             subList.first_node = last_prev_sublist->getNext();
             subList.last_node = last_sublist_node;
@@ -123,7 +134,7 @@ void List::sublist(int start, int end, List& subList) {
             subList.add(0, *this);
         }
         else if (start == 0){
-            Node* end_node = find_node(end);
+            Node<T>* end_node = find_node(end);
             subList.clear();
             subList.first_node = first_node;
             subList.last_node = end_node;
@@ -134,7 +145,7 @@ void List::sublist(int start, int end, List& subList) {
         }
         // end == n - 1
         else{
-            Node*first_prev_sublist = find_node(start - 1);
+            Node<T>*first_prev_sublist = find_node(start - 1);
             subList.clear();
             subList.n = end - start + 1;
             subList.first_node = first_prev_sublist->getNext();
@@ -146,9 +157,10 @@ void List::sublist(int start, int end, List& subList) {
     }
 }
 
-Node* List::find_node(int index) {
+template<class T>
+Node<T>* List<T>::find_node(int index) {
     if (index >= 0 && index < n){
-        Node* cur_node = first_node;
+        Node<T>* cur_node = first_node;
         int cur_index = 0;
         while (index!=cur_index){
             cur_node = cur_node->getNext();
@@ -159,16 +171,19 @@ Node* List::find_node(int index) {
     else if (index < 0) throw std::invalid_argument("");
     else throw std::out_of_range("");
 }
-void List::swap(int first, int second) {
-    Node *firstNode{find_node(first)},*secondNode{find_node(second)};
+
+template<class T>
+void List<T>::swap(int first, int second) {
+    Node<T> *firstNode{find_node(first)},*secondNode{find_node(second)};
     int first_value = firstNode->getValue();
     int second_value = secondNode->getValue();
     firstNode->setValue(second_value);
     secondNode->setValue(first_value);
 }
 
-int List::find_value(bool (*check)(int), int start) {
-    Node* cur_node = first_node;
+template<class T>
+int List<T>::find_value(bool (*check)(T t), int start) {
+    Node<T>* cur_node = first_node;
     int index = start;
     while (cur_node!= nullptr ){
         if (check(cur_node->getValue())) return index;
@@ -178,10 +193,11 @@ int List::find_value(bool (*check)(int), int start) {
     return -1;
 }
 
-void List::add(int index, List& list) {
+template<class T>
+void List<T>::add(int index, List<T>& list) {
     if (index!= 0 && index < n){
-        Node* previous_node = find_node(index);
-        Node* next_node = previous_node->getNext();
+        Node<T>* previous_node = find_node(index);
+        Node<T>* next_node = previous_node->getNext();
         previous_node->setNext(list.first_node);
         list.last_node->setNext(next_node);
         n+= list.n;
@@ -203,21 +219,24 @@ void List::add(int index, List& list) {
     else throw std::out_of_range("");
 }
 
-void List::lose_control() {
+template<class T>
+void List<T>::lose_control() {
     n = 0;
     first_node = nullptr;
     last_node = nullptr;
 }
 
-void List::sort(bool (*comparator)(int, int)) {
+template<class T>
+void List<T>::sort(bool (*comparator)(T, T)) {
 
 }
 
-void List::clear() {
+template<class T>
+void List<T>::clear() {
     int index = 0;
-    Node* cur_node = first_node;
+    Node<T>* cur_node = first_node;
     while (index < n){
-        Node* temp = cur_node->getNext();
+        Node<T>* temp = cur_node->getNext();
         delete cur_node;
         cur_node = temp;
         index++;
