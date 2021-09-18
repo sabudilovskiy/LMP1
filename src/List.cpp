@@ -50,21 +50,6 @@ template<class T>
 bool List<T>::empty() const {return n == 0;}
 
 template<class T>
-std::string List<T>::to_string(std::string (*to_string)(T t)) {
-    std::string answer;
-    if (first_node != nullptr) {
-        answer += std::to_string(first_node->getValue());
-        Node<T>* cur_node = first_node->getNext();
-        while (cur_node != nullptr){
-            answer += " " + std::to_string(cur_node->getValue());
-            cur_node = cur_node->getNext();
-        }
-        return answer;
-    }
-    else return "";
-}
-
-template<class T>
 void List<T>::remove_last() {
     if (last_node != nullptr){
         Node<T>* cur_node = find_node(n - 2);
@@ -228,7 +213,52 @@ void List<T>::lose_control() {
 
 template<class T>
 void List<T>::sort(bool (*comparator)(T, T)) {
-
+    if (n > 1) {
+        List<T> temp;
+        sublist(n / 2, n - 1, temp);
+        this->sort(comparator);
+        temp.sort(comparator);
+        Node<T> *cur_node_temp = temp.first_node;
+        Node<T> *cur_node_this = this->first_node;
+        Node<T> *prev_node_this = nullptr;
+        while (!temp.empty()) {
+            while (cur_node_this != nullptr &&
+                   comparator(cur_node_temp->getValue(), cur_node_this->getValue())
+                    ) {
+                prev_node_this = cur_node_this;
+                cur_node_this = cur_node_this->getNext();
+            }
+            if (cur_node_this == nullptr) {
+                last_node->setNext(cur_node_temp);
+                n += temp.n;
+                last_node = temp.last_node;
+                temp.lose_control();
+                return;
+            }
+            int count = 1;
+            Node<T> *begin = cur_node_temp;
+            Node<T> *end = cur_node_temp;
+            cur_node_temp = cur_node_temp->getNext();
+            while (cur_node_temp != nullptr &&
+                   !comparator(cur_node_temp->getValue(), cur_node_this->getValue())
+                    ) {
+                end = cur_node_temp;
+                cur_node_temp = cur_node_temp->getNext();
+                count++;
+            }
+            if (prev_node_this != nullptr){
+                prev_node_this->setNext(begin);
+                end->setNext(cur_node_this);
+            }
+            else {
+                end->setNext(first_node);
+                first_node = begin;
+            }
+            n += count;
+            temp.n -= count;
+        }
+        temp.lose_control();
+    }
 }
 
 template<class T>
@@ -243,4 +273,18 @@ void List<T>::clear() {
     }
 }
 
+template<class T>
+std::string List<T>::to_string(std::string (*to_string)(T)) {
+    std::string answer;
+    if (first_node != nullptr) {
+        answer += to_string(first_node->getValue());
+        Node<T>* cur_node = first_node->getNext();
+        while (cur_node != nullptr){
+            answer += " " + to_string(cur_node->getValue());
+            cur_node = cur_node->getNext();
+        }
+        return answer;
+    }
+    else return "";
+}
 
