@@ -32,11 +32,11 @@ int main() {
             auto more = [](int left, int right){return left > right;};
             auto odd = [](int x){return x%2 == 0;};
             List<int> odder;
-            std::cout << list.to_string(printer);
+            std::cout << list.to_string(printer)<< '\n';
             list.sort(more);
-            std::cout << list.to_string(printer);
+            std::cout << list.to_string(printer) << '\n';
             list.check(odd, odder);
-            std::cout << list.to_string(printer);
+            std::cout << odder.to_string(printer) << '\n';
             int begin = -1;
             int end = -1;
             for (int i = 1; i < odder.size(); i++) {
