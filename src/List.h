@@ -37,7 +37,7 @@ public:
     void swap(int first, int right);
     std::string to_string(std::string (*to_string)(T));
     //throw std::invalid_argument, std::out_of_range
-    T operator[](int index);
+    T& operator[](int index);
     //throw std::invalid_argument, std::out_of_range
     void sublist(int start, int end, List<T>& subList);
     //return index or -1
@@ -46,5 +46,6 @@ public:
     //используется сортировка слиянием
     void sort(bool (*comparator)(T left, T right));
     void clear();
+    void check(bool (*checker)(T t), List<int>& list, int start = 0);
 };
 #endif //LMP_LIST_H

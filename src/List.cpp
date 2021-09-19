@@ -94,7 +94,7 @@ int List<T>::size() const {
 }
 
 template<class T>
-T List<T>::operator[](int index) {
+T& List<T>::operator[](int index) {
    return find_node(index)->getValue();
 }
 
@@ -111,7 +111,6 @@ void List<T>::sublist(int start, int end, List<T>& subList) {
             subList.last_node = last_sublist_node;
             last_prev_sublist->setNext(last_sublist_node->getNext());
             subList.last_node->setNext(nullptr);
-
             n -= subList.n;
         }
         else if (start == 0 && end == n - 1){
@@ -123,7 +122,7 @@ void List<T>::sublist(int start, int end, List<T>& subList) {
             subList.clear();
             subList.first_node = first_node;
             subList.last_node = end_node;
-            first_node->setNext(end_node->getNext());
+            first_node = end_node->getNext();
             subList.last_node->setNext(nullptr);
             subList.n = end - start + 1;
             n -= subList.n;
@@ -286,5 +285,17 @@ std::string List<T>::to_string(std::string (*to_string)(T)) {
         return answer;
     }
     else return "";
+}
+
+template<class T>
+void List<T>::check(bool (*checker)(T), List<int>& list, int start) {
+    list.clear();
+    Node<T>* cur_node = find_node(start);
+    for (int i = start; i < n; i++){
+        if (checker(cur_node->getValue())){
+            list.push_back(i);
+        }
+        cur_node = cur_node->getNext();
+    }
 }
 

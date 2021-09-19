@@ -8,7 +8,7 @@ private:
     T value;
 public:
     Node(T value);
-    T getValue();
+    T& getValue();
     void setValue(T value);
     Node* getNext();
     void setNext(Node*);
